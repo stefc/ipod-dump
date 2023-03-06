@@ -20,7 +20,6 @@ public class MhodProxy : ChunkProxy
     public uint TotalSize => this.chunk.N1;
     public TextType TextType => (TextType)this.chunk.N2;
     public bool IsEmpty => this.chunk.N5 != 1;
-    public uint Foo => this.chunk.N5;
 
     public uint Length => this.chunk.N6; 
 

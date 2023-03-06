@@ -9,6 +9,7 @@ public class MhitProxy : ChunkProxy
 
     public uint TotalSize => this.chunk.N1;
     public uint NumChildren => this.chunk.N2;
+    public uint SongID => this.chunk.N3;
     public uint FileType => this.chunk.N6;
     public uint FileSize => this.chunk.N8;
     public TimeSpan Duration => TimeSpan.FromMilliseconds(chunk.N9);

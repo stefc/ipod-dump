@@ -8,34 +8,35 @@ public enum ChunkType
     mhsd,   // section
 
     mhlt,   // tracks
-    mhit,   // reference to title ? 
-
     mhlp,  // playlist
-    mhip,  // playlist
+    mhla,    // artist  
+    
+    mhit,   // title item  
+
+    mhip,   // playlist item
+    mhia,   // artist item
+    
     mhyp,   // playlist info 
 
-    mhia,
-    mhla,    // art ?  
     mhod,   // text info
     a28a    // end marker
 }
 
 /*
-mhbd = 1
-mhsd = 6    
+mhbd = 1 // header
+mhsd = 6 // sections 
 
-mhlt = 1  // songs left 
-mhit = 107  // equal to number of titles 
+mhlt = 1  // tracks 
+mhit = 107  // track 
 
-mhla = 1   // image  
-mhia = 2   // ?? 
+mhla = 1   // artists   
+mhia = 2   // artist
 
 mhlp = 3  // playlists 
-mhyp = 4  
-mhip = 214
+mhyp = 4   // 
+mhip = 214 // playlist item
 
 mhod = 1090 // text
-
 
 */
 
@@ -88,7 +89,6 @@ public class ChunkRaw
 
     public uint ChunkSize => BitConverter.ToUInt32(this.data, 4);
     public uint N1 => BitConverter.ToUInt32(this.data, 8);
-
     public uint N2 => BitConverter.ToUInt32(this.data, 12);
     public uint N3 => BitConverter.ToUInt32(this.data, 16);
     public uint N4 => BitConverter.ToUInt32(this.data, 20);

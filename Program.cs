@@ -23,12 +23,8 @@ if (current.Id == ChunkType.mhbd)
 }
 while (current != null && current.Id != ChunkType.a28a)
 {
-
-    while (current.Position > parent.Sibling)
-    {
-        parent = parent.Parent;
-    }
-
+    parent = current.Position < parent.Sibling ? current.Parent : parent.Parent; 
+    
     if (histogram.ContainsKey(current.Id))
     {
         histogram = histogram.SetItem(current.Id, histogram[current.Id] + 1);
@@ -42,6 +38,7 @@ while (current != null && current.Id != ChunkType.a28a)
     // System.Console.WriteLine($"{current.Id}: {current.ChunkSize:X4} - {current.N1:X4}");
 
     current = new ChunkRaw(fs, parent);
+
 
     if (current.Id == ChunkType.mhbd)
     {
@@ -67,6 +64,10 @@ while (current != null && current.Id != ChunkType.a28a)
     {
         chunks = chunks.Add(current.Position, new MhitProxy(current));
     } 
+    else if (current.Id == ChunkType.mhip)
+    {
+        chunks = chunks.Add(current.Position, new MhipProxy(current));
+    } 
     else if (current.Id == ChunkType.mhod)
     {
         chunks = chunks.Add(current.Position, new MhodProxy(current));
@@ -74,38 +75,6 @@ while (current != null && current.Id != ChunkType.a28a)
         chunks = chunks.Add(current.Position, new ChunkProxy(current));
     }
 }
-
-
-/*
-var read = fs.Read(chunk, 0, chunk.Length);
-while (read == chunk.Length ) {
-
-    var id = Parser.ChunkId(chunk);
-    if (id == ChunkType.a28a) break;
-
-    if (histogram.ContainsKey(id)) {
-        histogram = histogram.SetItem(id, histogram[id] + 1);
-    }
-    else 
-    {
-        histogram = histogram.Add(id, 1);
-    }
-
-    var chunkSize = BitConverter.ToUInt32(chunk, 4);
-    var n1 = BitConverter.ToUInt32(chunk, 8);
-    System.Console.WriteLine($"#{chunkNo} at {fs.Position-chunk.Length:X4}");
-    System.Console.WriteLine($"{id}: {chunkSize:X4} - {n1:X4}");
-    
-
-    System.Console.WriteLine();
-    
-    // this only works on 
-    fs.Seek((id == ChunkType.mhod ? n1 : chunkSize) - chunk.Length, SeekOrigin.Current);
-
-    // next chunk
-    read = fs.Read(chunk, 0, chunk.Length);
-    chunkNo++;
-} */
 
 foreach (var x in histogram)
 {
@@ -117,32 +86,37 @@ foreach (var chunk in chunks.Values.OrderBy( c => c.Position))
     switch (chunk)
     {
         case MhbdProxy mhbd:
-            System.Console.WriteLine("(mbhd)");
+            System.Console.WriteLine("Header");
             System.Console.WriteLine($"v{mhbd.VersionMajor}.{mhbd.VersionMinor}.{mhbd.VersionPatch}");
             break;
         case MhsdProxy mhsd:
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}(mbsd)");
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhsd.ChildSize:X4} {mhsd.ChildType}");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}Section");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhsd.ChildType}");
             break;
         case MhltProxy mhlt:
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}(mblt)");
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhlt.NumChildren}");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}Tape");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhlt.NumChildren} Tapes");
             break;
         case MhlpProxy mhlp:
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}(mblp)");
-            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhlp.NumChildren}");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}Playlists");
+            System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhlp.NumChildren} Playlists");
             break;
         case MhlaProxy mhla:
             System.Console.WriteLine($"{new String(' ', chunk.Level)}(mbla)");
             System.Console.WriteLine($"{new String(' ', chunk.Level)}{mhla.NumChildren}");
             break;
         case MhitProxy mhit: 
-           System.Console.WriteLine($"{new String(' ', chunk.Level)}(mhit)");
-           System.Console.WriteLine($"{new String(' ', chunk.Level)} {mhit.FileSize/1024.0/1024.0:N1} Mb {mhit.Duration.ToString(@"hh\:mm")} {mhit.Creation.ToShortDateString()}");
+           System.Console.WriteLine($"{new String(' ', chunk.Level)}Song");
+           System.Console.WriteLine($"{new String(' ', chunk.Level)} [#{mhit.SongID:x2}] {mhit.FileSize/1024.0/1024.0:N1} Mb {mhit.Duration.ToString(@"hh\:mm")} {mhit.Creation.ToShortDateString()}");
            break;
-        case MhodProxy mhod: 
-           System.Console.WriteLine($"{new String(' ', chunk.Level)}(mhod)");
-           System.Console.WriteLine($"{new String(' ', chunk.Level)} {mhod.TextType} {mhod.TotalSize:X4} {mhod.Foo}-{mhod.Length} {mhod.Text}");
+        case MhipProxy mhip: 
+           System.Console.WriteLine($"{new String(' ', chunk.Level)}Playlist-Item");
+           System.Console.WriteLine($"{new String(' ', chunk.Level)} [#{mhip.SongID:x2}] {mhip.Creation.ToShortDateString()} {mhip.Creation.ToShortTimeString()}");
+           break;
+        case MhodProxy mhod:
+            //if (mhod.TextType == TextType.SongTitle)  {
+                System.Console.WriteLine($"{new String(' ', chunk.Level)} {mhod.TextType} {mhod.Text}");
+            //}
            break;
         default:
            System.Console.WriteLine($"{new String(' ', chunk.Level)}({chunk.Id})");
