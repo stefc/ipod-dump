@@ -6,15 +6,15 @@ public enum ChunkType
 {
     mhbd,   // header
     mhsd,   // section
-    
+
     mhlt,   // tracks
     mhit,   // reference to title ? 
 
     mhlp,  // playlist
     mhip,  // playlist
     mhyp,   // playlist info 
-    
-    mhia, 
+
+    mhia,
     mhla,    // art ?  
     mhod,   // text info
     a28a    // end marker
@@ -50,65 +50,56 @@ static public class Parser
     }
 }
 
-public class ChunkRaw {
+public class ChunkRaw
+{
 
-    private readonly ChunkRaw parent; 
+    private const int PROLOG_LENGTH = 12;
+
+    private readonly ChunkRaw parent;
 
     private readonly long pos;
-    private readonly byte[] prolog = new byte[12];
-    private readonly byte[] data; 
+    private readonly byte[] data;
 
-    private readonly ChunkType id;
-
-    private readonly uint chunkSize;
-    private readonly uint n1;
-
-
+    private readonly Lazy<ChunkType> id;
+    
     public ChunkRaw(Stream stream, ChunkRaw? parent = null)
     {
         this.parent = parent == null ? this : parent;
         this.pos = stream.Position;
-        var read = stream.Read(prolog, 0, prolog.Length);
-        this.id = Parser.ChunkId(prolog);
-        this.chunkSize = BitConverter.ToUInt32(prolog, 4);
-        this.n1 = BitConverter.ToUInt32(prolog, 8);
-        if (id != ChunkType.a28a) {
-
-            var len =(int) (id == ChunkType.mhod ? n1 : this.chunkSize) - prolog.Length;
-            data = new byte[len];
-            read = stream.Read(data, 0, len);
-        } else {
-            var len = (int) (stream.Length - (this.pos+prolog.Length));
-            data = new byte[len];
-            read = stream.Read(data, 0, len);
-        }
+        this.data = new byte[PROLOG_LENGTH];
+        this.id = new Lazy<ChunkType>( () => Parser.ChunkId(this.data), true);
+        var read = stream.Read(this.data, 0, PROLOG_LENGTH);
+        var len = (int)((Id != ChunkType.a28a) ?
+                (Id == ChunkType.mhod ? this.N1 : this.ChunkSize) - PROLOG_LENGTH :
+                (stream.Length - (this.pos + PROLOG_LENGTH)));
+        Array.Resize(ref this.data, len + PROLOG_LENGTH);
+        read = stream.Read(data, PROLOG_LENGTH, len);
     }
 
 
-    public ChunkType Id => this.id;
+    public ChunkType Id => this.id.Value;
     public long Position => this.pos;
-    public uint ChunkSize => this.chunkSize;
-    public uint N1 => this.n1;
 
-    public long Sibling => this.pos + this.n1;
+    public long Sibling => this.pos + this.N1;
 
     public ChunkRaw Parent => this.parent;
 
     public Span<byte> Data => this.data;
 
-    public uint N2 => BitConverter.ToUInt32(this.data, 0);
-    public uint N3 => BitConverter.ToUInt32(this.data, 4);
-    public uint N4 => BitConverter.ToUInt32(this.data, 8);
-    public uint N5 => BitConverter.ToUInt32(this.data, 12);
-    public uint N6 => BitConverter.ToUInt32(this.data, 16);
-    public uint N7 => BitConverter.ToUInt32(this.data, 20);
-    public uint N8 => BitConverter.ToUInt32(this.data, 24);
-    public uint N9 => BitConverter.ToUInt32(this.data, 28);
-    public uint N10 => BitConverter.ToUInt32(this.data, 32);
+    public uint ChunkSize => BitConverter.ToUInt32(this.data, 4);
+    public uint N1 => BitConverter.ToUInt32(this.data, 8);
 
-    public string DecodeString(int len) {
-        return System.Text.Encoding.Unicode.GetString(this.data, 28, len);
-    }
+    public uint N2 => BitConverter.ToUInt32(this.data, 12);
+    public uint N3 => BitConverter.ToUInt32(this.data, 16);
+    public uint N4 => BitConverter.ToUInt32(this.data, 20);
+    public uint N5 => BitConverter.ToUInt32(this.data, 24);
+    public uint N6 => BitConverter.ToUInt32(this.data, 28);
+    public uint N7 => BitConverter.ToUInt32(this.data, 32);
+    public uint N8 => BitConverter.ToUInt32(this.data, 36);
+    public uint N9 => BitConverter.ToUInt32(this.data, 40);
+    public uint N10 => BitConverter.ToUInt32(this.data, 44);
+
+    public string DecodeString(int len) => System.Text.Encoding.Unicode.GetString(this.data, 40, len);
 }
 
 
