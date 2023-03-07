@@ -10,12 +10,12 @@ public enum ChunkType
     mhlt,   // tracks
     mhlp,  // playlist
     mhla,    // artist  
-    
+
     mhit,   // title item  
 
     mhip,   // playlist item
     mhia,   // artist item
-    
+
     mhyp,   // playlist info 
 
     mhod,   // text info
@@ -55,20 +55,17 @@ public class ChunkRaw
 {
 
     private const int PROLOG_LENGTH = 12;
-
-    private readonly ChunkRaw parent;
-
+    
     private readonly long pos;
     private readonly byte[] data;
 
     private readonly Lazy<ChunkType> id;
-    
-    public ChunkRaw(Stream stream, ChunkRaw? parent = null)
+
+    public ChunkRaw(Stream stream)
     {
-        this.parent = parent == null ? this : parent;
         this.pos = stream.Position;
         this.data = new byte[PROLOG_LENGTH];
-        this.id = new Lazy<ChunkType>( () => Parser.ChunkId(this.data), true);
+        this.id = new Lazy<ChunkType>(() => Parser.ChunkId(this.data), true);
         var read = stream.Read(this.data, 0, PROLOG_LENGTH);
         var len = (int)((Id != ChunkType.a28a) ?
                 (Id == ChunkType.mhod ? this.N1 : this.ChunkSize) - PROLOG_LENGTH :
@@ -81,10 +78,17 @@ public class ChunkRaw
     public ChunkType Id => this.id.Value;
     public long Position => this.pos;
 
+    public long Length
+    {
+        get
+        {
+            var len = (this.Id == ChunkType.mhod ? this.N1 : this.ChunkSize);
+            return len;
+        }
+    }
+
     public long Sibling => this.pos + this.N1;
-
-    public ChunkRaw Parent => this.parent;
-
+    
     public Span<byte> Data => this.data;
 
     public uint ChunkSize => BitConverter.ToUInt32(this.data, 4);

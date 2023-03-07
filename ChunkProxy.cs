@@ -10,18 +10,20 @@ public class ChunkProxy
     public long Position => this.chunk.Position;
     public ChunkType Id => this.chunk.Id;
 
-    public int Level
-    {
-        get
-        {
-            var level = 0;
-            var node = this.chunk;
-            while (node.Parent != node) {
-                level++;
-                node = node.Parent;
-            }
-            return level;
-        }
-    }
+}
 
+public static class ChunkFactory {
+
+    public static ChunkProxy Create(ChunkRaw current) => current.Id switch 
+    {
+        ChunkType.mhbd => new MhbdProxy(current),
+        ChunkType.mhsd => new MhsdProxy(current),
+        ChunkType.mhlt => new MhltProxy(current),
+        ChunkType.mhlp => new MhlpProxy(current),
+        ChunkType.mhla => new MhlaProxy(current),
+        ChunkType.mhit => new MhitProxy(current),
+        ChunkType.mhip => new MhipProxy(current),
+        ChunkType.mhod => new MhodProxy(current),
+        _ => new ChunkProxy(current)
+    };
 }
