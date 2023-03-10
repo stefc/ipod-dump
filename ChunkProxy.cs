@@ -23,6 +23,8 @@ public static class ChunkFactory {
         ChunkType.mhla => new MhlaProxy(current),
         ChunkType.mhit => new MhitProxy(current),
         ChunkType.mhip => new MhipProxy(current),
+        ChunkType.mhyp => new MhypProxy(current),
+        ChunkType.mhia => new MhiaProxy(current),
         ChunkType.mhod => new MhodProxy(current),
         _ => new ChunkProxy(current)
     };

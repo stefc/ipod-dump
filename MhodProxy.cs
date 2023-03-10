@@ -7,7 +7,10 @@ public enum TextType {
     Artist = 4,
     Genre = 5,
     FileType = 6, 
-    Comment = 8
+    Comment = 8,
+
+    ArtistAlbum = 200,
+    ArtistName = 201
 }
 
 public class MhodProxy : ChunkProxy
