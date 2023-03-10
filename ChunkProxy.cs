@@ -10,6 +10,8 @@ public class ChunkProxy
     public long Position => this.chunk.Position;
     public ChunkType Id => this.chunk.Id;
 
+     public Span<byte> Data => this.chunk.Data;
+
 }
 
 public static class ChunkFactory {
