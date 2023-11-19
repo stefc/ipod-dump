@@ -1,12 +1,7 @@
 namespace stefc.itunes;
 
-public class MhiaProxy : ChunkProxy
+public class MhiaAdapter(ChunkRaw chunk) : ChunkAdapter(chunk)
 {
-
-    public MhiaProxy(ChunkRaw chunk) : base(chunk)
-    {
-    }
-
     public uint TextCount => this.chunk.N2;
     public uint ArtistID => this.chunk.N3;
 

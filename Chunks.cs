@@ -78,14 +78,7 @@ public class ChunkRaw
     public ChunkType Id => this.id.Value;
     public long Position => this.pos;
 
-    public long Length
-    {
-        get
-        {
-            var len = (this.Id == ChunkType.mhod ? this.N1 : this.ChunkSize);
-            return len;
-        }
-    }
+    public long Length => (this.Id == ChunkType.mhod ? this.N1 : this.ChunkSize);
 
     public long Sibling => this.pos + this.N1;
     

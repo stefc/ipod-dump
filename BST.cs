@@ -35,20 +35,13 @@ public class Empty<T> : Tree<T> where T : IComparable<T>
 	public override IEnumerable<T> AsEnumerable() { yield break; }
 }
 
-public class Node<T> : Tree<T> where T : IComparable<T>
+public class Node<T>(Tree<T> Left, T Value, Tree<T> Right) : Tree<T> where T : IComparable<T>
 {
-	public Tree<T> Left { get; }
-	public Tree<T> Right { get; }
-	public T Value { get; }
+    public Tree<T> Left { get; } = Left;
+    public Tree<T> Right { get; } = Right;
+    public T Value { get; } = Value;
 
-	public Node(Tree<T> Left, T Value, Tree<T> Right)
-	{
-		this.Left = Left;
-		this.Right = Right;
-		this.Value = Value;
-	}
-
-	public override R Match<R>
+    public override R Match<R>
 	   (Func<R> Empty, Func<Tree<T>, T, Tree<T>, R> Node)
 	   => Node(Left, Value, Right);
 

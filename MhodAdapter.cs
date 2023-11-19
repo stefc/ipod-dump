@@ -13,23 +13,14 @@ public enum TextType {
     ArtistName = 201
 }
 
-public class MhodProxy : ChunkProxy
+public class MhodAdapter(ChunkRaw chunk) : ChunkAdapter(chunk)
 {
-
-    public MhodProxy(ChunkRaw chunk) : base(chunk)
-    {
-    }
-
     public uint TotalSize => this.chunk.N1;
     public TextType TextType => (TextType)this.chunk.N2;
     public bool IsEmpty => this.chunk.N5 != 1;
 
-    public uint Length => this.chunk.N6; 
+    public uint Length => this.chunk.N6;
 
-    public string Text {
-        get {
-            return IsEmpty ? string.Empty : this.chunk.DecodeString((int)Length);
-        }
-    }
-    
+    public string Text => IsEmpty ? string.Empty : this.chunk.DecodeString((int)Length);
+
 }

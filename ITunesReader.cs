@@ -4,13 +4,13 @@ namespace stefc.itunes;
 
 public static class ITunesReader {
     
-    public static IDictionary<long, ChunkProxy> ReadFromFile(string fileName) {
+    public static IDictionary<long, ChunkAdapter> ReadFromFile(string fileName) {
 
         var fs = File.OpenRead(fileName);
 
-        var chunks = ImmutableDictionary<long, ChunkProxy>.Empty;
+        var chunks = ImmutableDictionary<long, ChunkAdapter>.Empty;
 
-        bool eof = false;
+        bool eof;
         do
         {
             var current = new ChunkRaw(fs);

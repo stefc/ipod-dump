@@ -1,9 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using stefc.itunes;
 
-Console.WriteLine("Hello, World!");
-
-
 var chunks = ITunesReader.ReadFromFile("../green/iTunesDB");
 // var chunks = ITunesReader.ReadFromFile("../green/Copy_iTunesDB");
 

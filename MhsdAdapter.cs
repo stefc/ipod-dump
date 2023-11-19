@@ -9,12 +9,8 @@ public enum SectionType {
     Etc = 9
 }
 
-public class MhsdProxy : ChunkProxy
+public class MhsdAdapter(ChunkRaw chunk) : ChunkAdapter(chunk)
 {
-    public MhsdProxy(ChunkRaw chunk) : base(chunk)
-    {
-    }
-
     public uint ChildSize => this.chunk.N1;
     public SectionType SectionType => (SectionType)this.chunk.N2;
 }

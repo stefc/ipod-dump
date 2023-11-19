@@ -2,7 +2,7 @@ namespace stefc.itunes;
 
 public static class ITunesWriter {
 
-    public static void  WriteToFile(string fileName, IDictionary<long, ChunkProxy> chunks) {
+    public static void  WriteToFile(string fileName, IDictionary<long, ChunkAdapter> chunks) {
 
         var fs = File.OpenWrite(fileName);
 
